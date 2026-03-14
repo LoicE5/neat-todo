@@ -23,24 +23,52 @@ It was developed by [Loïc](https://github.com/LoicE5), [Maxime](https://github.
 
 # How to run the project
 
+> **Prerequisite:** [Bun](https://bun.sh) must be installed. All scripts use `bun` instead of `npm`.
+
+## Install dependencies (only once)
+
+```sh
+bun i
+```
+
 ## Create a .env file for the server (only once)
-`cd server && cp .env.example .env`
 
-For this exercise purpose, you don't need to edit the .env config (you may if you desire to). It works from scratch with the example. Indeed, in a business context, we don't do that.
-Then set a JWT_SECRET as well as your credentials for your MySQL DB.
+```sh
+cd server && cp .env.example .env
+```
 
-Note : Use `127.0.0.1` instead of `localhost` (if applicable), some bugs may occur.
+Set a `JWT_SECRET` and your Postgres credentials in the `.env` file.
 
-## Run
+Note: Use `127.0.0.1` instead of `localhost` (if applicable) to avoid connection issues.
 
-### Development
-`npm run dev`
+## Scripts
 
-**For only front-end or server :** `npm run dev:frontend`or `npm run dev:server`
+All scripts are run from the project root with `bun run <script>`.
 
-### Production
-`npm run build`
+| Script | Description |
+|---|---|
+| `dev` | Start frontend and server in parallel (requires a running Postgres instance) |
+| `dev:all` | Start frontend, server, **and** the Docker Compose database in parallel |
+| `dev:server:db` | Start only the database via Docker, then the server (waits 3s for DB to be ready) |
+| `dev:frontend` | Start only the Next.js frontend in dev mode |
+| `dev:server` | Start only the Express server with hot reload via `bun --watch` |
+| `build` | Build both frontend and server |
+| `build:frontend` | Build only the Next.js frontend |
+| `build:server` | Compile and build only the server |
+| `lint:frontend` | Run ESLint on the frontend |
+| `typecheck:server` | Run TypeScript type checking on the server (no emit) |
+| `db` | Start the Postgres database via Docker Compose |
 
-**For only front-end or server :** `npm run build:frontend`or `npm run build:server`
+### Common workflows
 
-Then, open your browser and head to `http://localhost:3000`.
+**With an external Postgres instance already running:**
+```sh
+bun run dev
+```
+
+**With the bundled Docker Compose database:**
+```sh
+bun run dev:all
+```
+
+Then open your browser and head to `http://localhost:3000`.
