@@ -64,7 +64,8 @@ async function signup(req: Request, res: Response): Promise<void> {
 
     try {
 
-        const newUser: Model = await User.create(payload as Optional<any, any>)
+        const newUser: Model = await User.create(payload as Optional<any, any>) as any
+        delete newUser.dataValues.password
         res.status(201).json(newUser)
 
     } catch(error: unknown) {

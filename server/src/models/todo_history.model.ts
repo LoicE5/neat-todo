@@ -36,24 +36,18 @@ const TodoHistory = sequelize.define('TodoHistory', {
     },
     assignee_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'user_',
             key: 'id',
-        },
-        validate: {
-            isAlphanumeric: true
         }
     },
     author_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'user_',
             key: 'id',
-        },
-        validate: {
-            isAlphanumeric: true
         }
     },
   }, {

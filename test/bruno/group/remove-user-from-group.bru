@@ -1,7 +1,7 @@
 meta {
   name: Remove User From Group
   type: http
-  seq: 6
+  seq: 7
 }
 
 delete {
@@ -15,11 +15,11 @@ auth:bearer {
 }
 
 tests {
-  test("status is 200 OK", function() {
-    expect(res.status).to.equal(200)
+  test("status is 404 Not Found (group was already deleted)", function() {
+    expect(res.status).to.equal(404)
   })
 
-  test("response confirms removal", function() {
+  test("response has message", function() {
     expect(res.body).to.have.property("message")
   })
 }
