@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeAll } from "bun:test"
+import { describe, it, expect, mock } from "bun:test"
 import jwt from "jsonwebtoken"
 
 // Set env before any imports that use JWT_SECRET
@@ -29,7 +29,7 @@ const {
     isObjectEmpty,
     isUserRelatedToTodo,
     isValidTodoStatus
-} = await import("../utils/functions")
+} = await import("../../server/src/utils/functions")
 
 const TEST_SECRET = "test-secret-key"
 
