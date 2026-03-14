@@ -6,3 +6,5 @@ server/build/*
 .env
 *.sqlite
 .vercel
+docker/volumes/postgres/*
+!docker/volumes/postgres/.gitkeep
