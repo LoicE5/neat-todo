@@ -1,0 +1,27 @@
+meta {
+  name: Rename Group
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/group/{{groupId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Renamed Test Group"
+  }
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+}

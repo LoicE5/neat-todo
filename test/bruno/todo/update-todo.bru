@@ -1,0 +1,36 @@
+meta {
+  name: Update Todo By ID
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/todo/{{todoId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Updated Test Todo",
+    "status": "in_progress"
+  }
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("title is updated", function() {
+    expect(res.body.title).to.equal("Updated Test Todo")
+  })
+
+  test("status is in_progress", function() {
+    expect(res.body.status).to.equal("in_progress")
+  })
+}

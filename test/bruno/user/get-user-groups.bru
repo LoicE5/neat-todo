@@ -1,0 +1,25 @@
+meta {
+  name: Get User Groups
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/user/{{userId}}/groups
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response is an array", function() {
+    expect(Array.isArray(res.body)).to.equal(true)
+  })
+}

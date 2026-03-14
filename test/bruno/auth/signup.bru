@@ -1,0 +1,40 @@
+meta {
+  name: Signup
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nickname": "testuser",
+    "email": "testuser@example.com",
+    "password": "TestPassword123"
+  }
+}
+
+tests {
+  test("status is 201 Created", function() {
+    expect(res.status).to.equal(201)
+  })
+
+  test("response has user data without password", function() {
+    expect(res.body).to.have.property("id")
+    expect(res.body).to.have.property("email")
+    expect(res.body).to.have.property("nickname")
+    expect(res.body).not.to.have.property("password")
+  })
+
+  test("email matches the request", function() {
+    expect(res.body.email).to.equal("testuser@example.com")
+  })
+
+  test("nickname matches the request", function() {
+    expect(res.body.nickname).to.equal("testuser")
+  })
+}

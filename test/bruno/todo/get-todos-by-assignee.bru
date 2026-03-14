@@ -1,0 +1,32 @@
+meta {
+  name: Get Todos By Assignee
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/todo/assignee/{{userId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response is an array", function() {
+    expect(Array.isArray(res.body)).to.equal(true)
+  })
+
+  test("all todos are assigned to the current user", function() {
+    const userId = Number(bru.getEnvVar("userId"))
+    res.body.forEach(function(todo) {
+      expect(todo.assignee_id).to.equal(userId)
+    })
+  })
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Login Invalid Credentials
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "testuser@example.com",
+    "password": "WrongPassword!"
+  }
+}
+
+tests {
+  test("status is 401 Unauthorized", function() {
+    expect(res.status).to.equal(401)
+  })
+
+  test("response has error message", function() {
+    expect(res.body).to.have.property("message")
+  })
+}

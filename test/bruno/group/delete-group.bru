@@ -1,0 +1,26 @@
+meta {
+  name: Delete Group By ID
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/group/{{groupId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response confirms deletion", function() {
+    expect(res.body).to.have.property("message")
+    expect(res.body.message).to.equal("Group deleted successfully")
+  })
+}

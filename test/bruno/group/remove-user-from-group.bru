@@ -1,0 +1,25 @@
+meta {
+  name: Remove User From Group
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/group/{{groupId}}/{{userId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response confirms removal", function() {
+    expect(res.body).to.have.property("message")
+  })
+}

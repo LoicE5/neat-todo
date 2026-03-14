@@ -1,0 +1,52 @@
+meta {
+  name: Create Todo
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/todo
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Test Todo",
+    "description": "This is a test todo created by Bruno",
+    "deadline": "2026-12-31",
+    "status": "not_started",
+    "assignee_id": {{userId}},
+    "author_id": {{userId}}
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setEnvVar("todoId", res.body.id)
+  }
+}
+
+tests {
+  test("status is 201 Created", function() {
+    expect(res.status).to.equal(201)
+  })
+
+  test("response has todo data", function() {
+    expect(res.body).to.have.property("id")
+    expect(res.body).to.have.property("title")
+    expect(res.body).to.have.property("status")
+  })
+
+  test("title matches the request", function() {
+    expect(res.body.title).to.equal("Test Todo")
+  })
+
+  test("status is not_started", function() {
+    expect(res.body.status).to.equal("not_started")
+  })
+}
