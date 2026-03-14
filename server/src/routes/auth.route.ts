@@ -26,7 +26,7 @@ async function login(req: Request, res: Response): Promise<void> {
         return defaultFail()
 
     try {
-        const user: Model | any = await User.findOne({ where: { email: email } })
+        const user = await User.findOne({ where: { email: email } }) as any
 
         if(!user)
             return defaultFail()

@@ -70,6 +70,7 @@ async function createATodo(req: Request, res: Response): Promise<void> {
         res.status(201).json(newTodo)
 
     } catch(error: unknown) {
+        console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
 }
@@ -160,6 +161,7 @@ async function updateTodoById(req: Request, res: Response): Promise<void> {
         res.json(toBeUpdatedTodo)
 
     } catch(error: unknown) {
+        console.error(error)
         if((error as any).name == 'SequelizeUniqueConstraintError')
             failRequest(res, 409, `You can't assign the todo to this user`)
         else

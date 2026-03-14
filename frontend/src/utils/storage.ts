@@ -29,6 +29,7 @@ const storage = {
             try {
                 return JSON.parse(sessionStorage.getItem(`user`) as string)
             } catch(error: unknown) {
+                console.error('Failed to parse user from sessionStorage:', error)
                 return {}
             }
         }
