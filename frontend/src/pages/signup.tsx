@@ -1,15 +1,14 @@
 import { FormEvent, useEffect, useState } from "react"
-import config from '../../config'
 import { useRouter } from 'next/router'
 import storage from "@/utils/storage"
 import { userLogin } from "./login"
 import Link from "next/link"
 
-export default function signup() {
+export default function Signup() {
     const router = useRouter()
 
     useEffect(() => {
-        if (storage.jwt.exists())
+        if(storage.jwt.exists())
             router.push('/workplace')
     }, [])
 
@@ -21,10 +20,10 @@ export default function signup() {
     async function handleFormSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault()
 
-        if (!email || !nickname || !password || !passwordConfirm)
+        if(!email || !nickname || !password || !passwordConfirm)
             return alert(`Please fill the form as required`)
 
-        if (password !== passwordConfirm)
+        if(password !== passwordConfirm)
             return alert(`Your passwords does not match`)
 
         const payload = {
@@ -41,7 +40,7 @@ export default function signup() {
             body: JSON.stringify(payload)
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`Your signup have failed. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         await userLogin(email, password, router)
@@ -54,7 +53,7 @@ export default function signup() {
             height: "100vh"
         }}>
             <Link href="/">
-                <img src="neat_logo.png" alt="logo" style={{ position: "absolute", top: "0", right: "0", width: "100px", }} />
+                <img src="neat_logo.png" alt="logo" style={{ position: "absolute", top: "0", right: "0", width: "100px" }} />
             </Link>
 
             <form onSubmit={handleFormSubmit}>

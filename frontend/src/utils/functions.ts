@@ -1,5 +1,5 @@
 export function decodeSafeHtmlChars(str: string): string {
-    if (!str)
+    if(!str)
         return ""
-    return str.replace('&#x27;',"'")
+    return str.replace('&#x27;', "'")
 }

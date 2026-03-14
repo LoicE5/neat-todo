@@ -2,29 +2,28 @@ import Header from "@/components/Header"
 import { userGetResponse } from "@/utils/interfaces"
 import storage from "@/utils/storage"
 import React, { FormEvent, useEffect, useState } from 'react'
-import config from '../../config'
 import { useRouter } from "next/router"
 import SkewTitle from "@/components/SkewTitle"
 
 interface userEditPayload {
-    nickname: string,
-    email: string,
+    nickname: string
+    email: string
     password?: string
 }
 
 export default function UserDetail() {
 
     const router = useRouter()
-    const user = storage.user.load() as userGetResponse
+    const user = (typeof window !== 'undefined' ? storage.user.load() : {}) as userGetResponse
 
-    const [userNickname, setUserNickname] = useState(user.nickname)
-    const [userEmail, setUserEmail] = useState(user.email)
+    const [userNickname, setUserNickname] = useState(user?.nickname || '')
+    const [userEmail, setUserEmail] = useState(user?.email || '')
     const [userPassword, setUserPassword] = useState("false")
 
 
     useEffect(() => {
 
-        if (!storage.jwt.exists()) {
+        if(!storage.jwt.exists()) {
             router.push('/login')
             return
         }
@@ -36,12 +35,12 @@ export default function UserDetail() {
     async function editUserOnSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault()
 
-        let payload: userEditPayload = {
+        const payload: userEditPayload = {
             nickname: userNickname,
             email: userEmail,
         }
 
-        if (userPassword && userPassword !== "false") {
+        if(userPassword && userPassword !== "false") {
             payload.password = userPassword
         }
 
@@ -56,7 +55,7 @@ export default function UserDetail() {
             body: JSON.stringify(payload)
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We failed creating or editing your User. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         await router.push('/workplace')
@@ -104,11 +103,11 @@ export default function UserDetail() {
                     <div className="bg-gray-400 rounded-md p-4 items-center border border-gray-800 ml-5 shadow-2xl" style={{ width: "90%", height: "350px", marginRight: '1.25rem' }}>
                         <h3 className="text-gray-800" style={{ fontWeight: "bold", textAlign: "center", marginBottom: 0 }}>Account</h3>
                         <br />
-                        <div className=" items-center mx-auto" style={{ paddingTop: "1vw" }}>
+                        <div className="items-center mx-auto" style={{ paddingTop: "1vw" }}>
                             <div className="text-left" style={{ width: "35vw" }}>
                                 <label htmlFor="nickname" className="text-gray-800 block">Nickname</label>
                                 <input
-                                    type="nickname"
+                                    type="text"
                                     name="inputNickname"
                                     placeholder="someone"
                                     value={userNickname}

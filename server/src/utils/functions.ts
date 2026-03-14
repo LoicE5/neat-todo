@@ -9,17 +9,17 @@ import { TodoStatus } from "./enums"
 
 /**
  * Creates a standardized response, with the response code in params and a custom message forwarded via json
- * @param res 
- * @param status 
- * @param message 
+ * @param res
+ * @param status
+ * @param message
  */
-export function failRequest(res:Response, status: number, message: string): void {
+export function failRequest(res: Response, status: number, message: string): void {
     res.status(status).json({ message: message }) as any
 }
 
 /**
  * Returns a salted hashed version of the given password
- * @param password 
+ * @param password
  * @returns {string}
  */
 export async function hashPassword(password: string): Promise<string> {
@@ -33,7 +33,7 @@ export async function hashPassword(password: string): Promise<string> {
  * @param secret The secret used to encode the token
  * @returns {userDecodedJwtToken}
  */
-export function decodeJwtToken(authHeader: IncomingHttpHeaders["authorization"]|string, secret: string = jwtSecret): userDecodedJwtToken {
+export function decodeJwtToken(authHeader: IncomingHttpHeaders["authorization"] | string, secret: string = jwtSecret): userDecodedJwtToken {
     const reqToken = authHeader.slice(7) // Remove the "Bearer " string before the actual token
     const decodedToken = jwt.verify(reqToken, secret) as userDecodedJwtToken
     return decodedToken
@@ -45,14 +45,14 @@ export function decodeJwtToken(authHeader: IncomingHttpHeaders["authorization"]|
  * @param id often found in the params : req.params.id
  * @returns {boolean}
  */
-export function isUserIdFromTokenMatchingRequest(authHeader:IncomingHttpHeaders["authorization"]|string, id:number|string): boolean {
+export function isUserIdFromTokenMatchingRequest(authHeader: IncomingHttpHeaders["authorization"] | string, id: number | string): boolean {
 
-    if (!authHeader || !authHeader.startsWith('Bearer '))
+    if(!authHeader || !authHeader.startsWith('Bearer '))
         return false
-    
+
     const reqUserId: number = decodeJwtToken(authHeader).id
 
-    if (id !== reqUserId)
+    if(id !== reqUserId)
         return false
 
     return true
@@ -60,7 +60,7 @@ export function isUserIdFromTokenMatchingRequest(authHeader:IncomingHttpHeaders[
 
 /**
  * Checks if an object have no keys at all
- * @param obj 
+ * @param obj
  * @returns {boolean}
  */
 export function isObjectEmpty(obj: Record<string, any>): boolean {
@@ -74,10 +74,10 @@ export function isObjectEmpty(obj: Record<string, any>): boolean {
  * @param userId Optional, the userId of the user if already given
  * @returns {boolean}
  */
-export async function isUserRelatedToTodo(user: Model<any, any>|any, todo: Model<any, any>|any, userId: number = null):Promise<boolean> {
-    if (!userId)
+export async function isUserRelatedToTodo(user: Model<any, any> | any, todo: Model<any, any> | any, userId: number = null): Promise<boolean> {
+    if(!userId)
         userId = user.id
-    
+
     return (
         userId === todo.assignee_id ||
         userId === todo.author_id ||

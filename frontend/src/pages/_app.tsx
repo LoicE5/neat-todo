@@ -10,7 +10,7 @@ function App({ Component, pageProps, router }: AppProps) {
     return (
         <>
             <AnimatePresence mode='wait'>
-                <motion.div key={router.route} >
+                <motion.div key={router.route}>
                     <Component {...pageProps} />
                     <motion.div
                         className="slide-in"
@@ -31,7 +31,7 @@ function App({ Component, pageProps, router }: AppProps) {
             </AnimatePresence>
             <Analytics mode='auto' />
         </>
-    );
+    )
 }
 
-export default App;
+export default App

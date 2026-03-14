@@ -19,19 +19,19 @@ export default routerUser
 async function getUserById(req: Request, res: Response): Promise<void> {
     try {
         const id = Number(req.params.id)
-        
+
         if(!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
             return failRequest(res, 401, `Unauthorized`)
 
         const user = await User.findByPk(id, { attributes: { exclude: ['password'] } })
-        
-        if (!user) 
-            return failRequest(res,404,`User not found`)
-        
+
+        if(!user)
+            return failRequest(res, 404, `User not found`)
+
         res.json(user)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
-        failRequest(res,500,`Internal server error`)
+        failRequest(res, 500, `Internal server error`)
     }
 
 }
@@ -42,7 +42,7 @@ async function getUserGroupsById(req: Request, res: Response): Promise<void> {
 
         if(!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
             return failRequest(res, 401, `Unauthorized`)
-        
+
         const user = await User.findByPk(id, {
             include: [{
                 model: Group,
@@ -63,58 +63,58 @@ async function getUserGroupsById(req: Request, res: Response): Promise<void> {
             } as any],
         }) as any
 
-        if (!user) 
-            return failRequest(res,404,`User not found`)
-        
+        if(!user)
+            return failRequest(res, 404, `User not found`)
+
         res.json(user.Groups)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
-        failRequest(res,500,`Internal server error`)
+        failRequest(res, 500, `Internal server error`)
     }
 }
 
 async function updateUserById(req: Request, res: Response): Promise<void> {
     try {
-        
+
         const id = Number(req.params.id)
 
         // If the user tries to access another user's profile (token's id doesn't match params id)
-        if (!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
+        if(!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
             return failRequest(res, 401, `Unauthorized`)
 
         const { nickname, email, password }: userUpdatePayload = req.body
 
-        let updatePayload: userUpdatePayload = {}
+        const updatePayload: userUpdatePayload = {}
 
-        if (nickname)
+        if(nickname)
             updatePayload.nickname = validator.escape(nickname)
-        
+
         // If an email is provided, we check if it is well formed and push it, otherwise we warn
-        if (email) {
+        if(email) {
             if(validator.isEmail(email))
                 updatePayload.email = validator.escape(email)
             else
                 return failRequest(res, 400, `Your email address doesn't have the right format`)
         }
-        
-        if (password) 
+
+        if(password)
             updatePayload.password = await hashPassword(password)
 
         // If the payload we generate haven't been populated (wrong params, empty body, ...), we fail the req
-        if (isObjectEmpty(updatePayload))
+        if(isObjectEmpty(updatePayload))
             return failRequest(res, 400, `Your request doesn't have the adequate parameters`)
-        
+
         const updatedUser = await User.update(
             updatePayload,
-            { 
+            {
                 where: { id }
             }
         )
 
         res.json(updatedUser)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
-        if (error.name == 'SequelizeUniqueConstraintError')
+        if((error as any).name == 'SequelizeUniqueConstraintError')
             failRequest(res, 409, `This nickname and/or email address is already taken`)
         else
             failRequest(res, 500, `Internal server error`)
@@ -126,19 +126,19 @@ async function deleteUserById(req: Request, res: Response): Promise<void> {
         const id = Number(req.params.id)
 
         // If the user tries to access another user's profile (token's id doesn't match params id)
-        if (!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
+        if(!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
             return failRequest(res, 401, `Unauthorized`)
 
         const user = await User.findByPk(id)
 
-        if (!user) 
+        if(!user)
             return failRequest(res, 404, `User not found`)
 
         await user.destroy()
 
         res.json({ message: 'User deleted successfully' })
 
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }

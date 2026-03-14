@@ -1,6 +1,5 @@
 import Header from "@/components/Header"
 import Todo from "@/components/Todo"
-import config from '../../config'
 import storage from "@/utils/storage"
 import { todoGetResponse, userGetResponse } from "@/utils/interfaces"
 import { useEffect, useState } from "react"
@@ -14,7 +13,7 @@ export default function Workplace() {
 
     useEffect(() => {
 
-        if (!storage.jwt.exists()) {
+        if(!storage.jwt.exists()) {
             router.push('/login')
             return
         }
@@ -34,7 +33,7 @@ export default function Workplace() {
             }
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We failed fetching your todo. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         const responsePayload = await response.json() as todoGetResponse[]
@@ -65,5 +64,3 @@ export default function Workplace() {
     )
 
 }
-
-

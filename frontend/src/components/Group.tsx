@@ -1,14 +1,13 @@
 import Link from "next/link"
-import config from '../../config'
 import storage from "@/utils/storage"
 import { userGetResponse } from "@/utils/interfaces"
 import { NextRouter, useRouter } from "next/router"
 
 interface GroupProps {
-    id: number,
-    title: string,
-    userCount: number,
-    user?: userGetResponse,
+    id: number
+    title: string
+    userCount: number
+    user?: userGetResponse
     router?: NextRouter
 }
 
@@ -22,20 +21,20 @@ export async function removeUserFromGroup(groupId: number, user: userGetResponse
         }
     })
 
-    if (!response.ok)
+    if(!response.ok)
         return alert(`We failed removing you from the group. Response code : ${response.status}. Error message : ${await response.text()}`)
 
-    if (reload)
+    if(reload)
         return router.reload()
     else
         return await router.push('/groups') as any
 }
 
 export default function Group({ id, title, userCount, user, router }: GroupProps) {
-    if (!router)
+    if(!router)
         router = useRouter()
 
-    if (!user)
+    if(!user)
         user = storage.user.load() as userGetResponse
 
     return (

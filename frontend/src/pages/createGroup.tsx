@@ -2,21 +2,20 @@ import Header from "@/components/Header"
 import { userGetResponse } from "@/utils/interfaces"
 import storage from "@/utils/storage"
 import { FormEvent, useState } from "react"
-import config from '../../config'
 import { useRouter } from "next/router"
 import SkewTitle from "@/components/SkewTitle"
 
 export default function CreateGroup() {
-    const user = storage.user.load() as userGetResponse
+    const user = (typeof window !== 'undefined' ? storage.user.load() : {}) as userGetResponse
     const router = useRouter()
 
     const [groupName, setGroupName] = useState("")
-    const [firstUserEmail, setFirstUserEmail] = useState(user.email)
+    const [firstUserEmail, setFirstUserEmail] = useState(user?.email || '')
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault()
 
-        if (!groupName || !firstUserEmail)
+        if(!groupName || !firstUserEmail)
             return alert(`Please fill the form as required`)
 
         const payload = {
@@ -33,7 +32,7 @@ export default function CreateGroup() {
             body: JSON.stringify(payload)
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We failed creating your group. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         await router.push('/groups')
