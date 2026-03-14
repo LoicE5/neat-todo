@@ -3,7 +3,7 @@
     "builds": [
         {
             "src": "/api/index.ts",
-            "use": "@vercel/node"
+            "use": "@vercel/bun"
         },
         {
             "src": "frontend/next.config.js",
