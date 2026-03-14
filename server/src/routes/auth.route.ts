@@ -35,7 +35,7 @@ async function login(req: Request, res: Response): Promise<void> {
             const payload = { id: user.id }
             const token = jwt.sign(payload, secret)
             delete user.dataValues.password
-            return res.json({ message: 'ok', token: token, user: user }) as any
+            return void res.json({ message: 'ok', token: token, user: user })
         }
 
         return defaultFail()
