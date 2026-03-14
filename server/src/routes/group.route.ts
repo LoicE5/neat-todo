@@ -178,7 +178,7 @@ async function addUserToGroupById(req: Request, res: Response): Promise<void> {
 async function addUserToGroupByEmail(req: Request, res: Response): Promise<void> {
     try {
         const id = Number(req.params.id)
-        const email = validator.escape(req.params.email)
+        const email = validator.escape(req.params.email as string)
 
         if(!id || !email || !validator.isEmail(email))
             return failRequest(res, 400, `You must provide a group id and a user email in the request parameters`)

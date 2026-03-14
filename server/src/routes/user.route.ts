@@ -41,7 +41,7 @@ async function getUserById(req: Request, res: Response): Promise<void> {
 
 async function getUserGroupsById(req: Request, res: Response): Promise<void> {
     try {
-        const id = Number(validator.escape(req.params.id))
+        const id = Number(validator.escape(req.params.id as string))
 
         if(!isUserIdFromTokenMatchingRequest(req.headers.authorization, id))
             return failRequest(res, 401, `Unauthorized`)
