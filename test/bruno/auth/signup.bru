@@ -10,11 +10,23 @@ post {
   auth: none
 }
 
+script:pre-request {
+  const ts = Date.now()
+  bru.setEnvVar("testEmail", `testuser${ts}@example.com`)
+  bru.setEnvVar("testNickname", `testuser${ts}`)
+}
+
 body:json {
   {
-    "nickname": "testuser",
-    "email": "testuser@example.com",
+    "nickname": "{{testNickname}}",
+    "email": "{{testEmail}}",
     "password": "TestPassword123"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setEnvVar("userId", res.body.id)
   }
 }
 
@@ -31,10 +43,10 @@ tests {
   })
 
   test("email matches the request", function() {
-    expect(res.body.email).to.equal("testuser@example.com")
+    expect(res.body.email).to.equal(bru.getEnvVar("testEmail"))
   })
 
   test("nickname matches the request", function() {
-    expect(res.body.nickname).to.equal("testuser")
+    expect(res.body.nickname).to.equal(bru.getEnvVar("testNickname"))
   })
 }
