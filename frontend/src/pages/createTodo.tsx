@@ -5,11 +5,11 @@ import storage from "@/utils/storage"
 import { userGetResponse } from "@/utils/interfaces"
 import TodoForm from "@/components/TodoForm"
 
-export default function createTodo() {
+export default function CreateTodo() {
 
     const user = storage.user.load()
     const router = useRouter()
-    const defaultDeadline = new Date().toISOString().split('T')[0]
+    const defaultDeadline = new Date().toISOString().split('T').at(0)
 
     return (
         <>

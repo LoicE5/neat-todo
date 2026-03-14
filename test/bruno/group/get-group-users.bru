@@ -1,0 +1,39 @@
+meta {
+  name: Get Group Users
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/group/{{groupId}}/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response is an array", function() {
+    expect(Array.isArray(res.body)).to.equal(true)
+  })
+
+  test("users do not expose passwords", function() {
+    res.body.forEach(function(user) {
+      expect(user).not.to.have.property("password")
+    })
+  })
+
+  test("each user has id, email and nickname", function() {
+    res.body.forEach(function(user) {
+      expect(user).to.have.property("id")
+      expect(user).to.have.property("email")
+      expect(user).to.have.property("nickname")
+    })
+  })
+}

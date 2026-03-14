@@ -1,0 +1,32 @@
+meta {
+  name: Get User By ID
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/user/{{userId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response has user data without password", function() {
+    expect(res.body).to.have.property("id")
+    expect(res.body).to.have.property("email")
+    expect(res.body).to.have.property("nickname")
+    expect(res.body).not.to.have.property("password")
+  })
+
+  test("user id matches the requested id", function() {
+    expect(res.body.id).to.equal(Number(bru.getEnvVar("userId")))
+  })
+}

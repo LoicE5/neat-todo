@@ -3,7 +3,6 @@ import Todo from "@/components/Todo"
 import { groupGetResponse, todoGetResponse, userGetResponse } from "@/utils/interfaces"
 import storage from "@/utils/storage"
 import React, { useEffect, useState } from 'react'
-import config from '../../config'
 import { useRouter } from "next/router"
 import { removeUserFromGroup } from "@/components/Group"
 import SkewTitle from "@/components/SkewTitle"
@@ -22,7 +21,7 @@ export default function GroupDetails() {
 
     useEffect(() => {
 
-        if (!storage.jwt.exists()) {
+        if(!storage.jwt.exists()) {
             router.push('/login')
             return
         }
@@ -30,13 +29,13 @@ export default function GroupDetails() {
         const { group_id } = router.query
         let groupIdInteger = parseInt(group_id as string)
 
-        if (!groupIdInteger) {
+        if(!groupIdInteger) {
 
             // If we access the page via another way than the Next Router (direct URL access or other), we can check the GET params the old way
             const urlSearchParams = new URLSearchParams(window.location.search)
             const groupIdFromQueryString = urlSearchParams.get('group_id')
 
-            if (groupIdFromQueryString) {
+            if(groupIdFromQueryString) {
                 groupIdInteger = parseInt(groupIdFromQueryString)
             } else {
                 router.push('/404')
@@ -46,14 +45,14 @@ export default function GroupDetails() {
 
         getGroupTodosById(groupIdInteger).then((todos: any) => {
 
-            if (todos.length <= 0) {
+            if(todos.length <= 0) {
                 setTodoElements([(<h2 key={0}>There is no ToDo in this group</h2>)] as any)
                 getGroupNameById(groupIdInteger).then(name => setGroupName(name as string))
                 return
             }
 
             // If we can, we avoid another API call by setting the group name from the todo list
-            setGroupName((todos as todoGetResponse[])[0].group!.name)
+            setGroupName((todos as todoGetResponse[]).at(0)!.group!.name)
 
             setTodoElements(
                 todos.map((todo: todoGetResponse) => (
@@ -87,13 +86,13 @@ export default function GroupDetails() {
         setInputVisible(!inputVisible)
 
         // If hiding the input, clear the text
-        if (!inputVisible) {
+        if(!inputVisible) {
             setTextInput('')
         }
     }
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement> | React.ChangeEvent<HTMLInputElement>) {
-        if ((event as React.KeyboardEvent<HTMLInputElement>).key === 'Enter')
+        if((event as React.KeyboardEvent<HTMLInputElement>).key === 'Enter')
             addUserToGroupByEmail((event as React.ChangeEvent<HTMLInputElement>).target.value, groupId)
     }
 
@@ -106,7 +105,7 @@ export default function GroupDetails() {
             }
         })
 
-        if (!response.ok) {
+        if(!response.ok) {
             console.error(`We failed getting the todos of your group. Response code : ${response.status}. Error message : ${await response.text()}`)
             return await router.push('/groups') as any
         }
@@ -125,7 +124,7 @@ export default function GroupDetails() {
             }
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We failed getting the users of your group. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         const responsePayload = await response.json() as userGetResponse[]
@@ -142,7 +141,7 @@ export default function GroupDetails() {
             }
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We failed deleting your group. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         await router.push('/groups')
@@ -157,7 +156,7 @@ export default function GroupDetails() {
             }
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return console.error(`We couldn't find the group you're looking for. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         const responsePayload = await response.json() as groupGetResponse
@@ -174,7 +173,7 @@ export default function GroupDetails() {
             }
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We couldn't add the user ${userEmail} to the group. Response code : ${response.status}. Error message : ${await response.text()}`)
 
         router.reload()
@@ -232,7 +231,7 @@ export default function GroupDetails() {
                                 type="email"
                                 placeholder="someone@dauphine.eu"
                                 value={textInput}
-                                onChange={(e) => setTextInput(e.target.value)}
+                                onChange={(event) => setTextInput(event.target.value)}
                                 onKeyDown={handleKeyDown}
                             />
                         </div>

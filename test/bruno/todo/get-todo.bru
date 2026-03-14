@@ -1,0 +1,31 @@
+meta {
+  name: Get Todo By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/todo/{{todoId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response has todo data", function() {
+    expect(res.body).to.have.property("id")
+    expect(res.body).to.have.property("title")
+    expect(res.body).to.have.property("status")
+  })
+
+  test("todo id matches the requested id", function() {
+    expect(res.body.id).to.equal(Number(bru.getEnvVar("todoId")))
+  })
+}

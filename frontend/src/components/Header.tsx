@@ -13,7 +13,7 @@ export default function Header() {
     return (
         <header className="bg-gray-500 shadow-2xl" style={{ marginBottom: "20px" }}>
             <nav className="mx-auto flex max-w-7xl items-center justify-between p-2 lg:px-8" aria-label="Global">
-                <div className="flex lg:flex-1" >
+                <div className="flex lg:flex-1">
                     <Link href="/workplace" className="-m-1.5 p-1.5">
                         <img className="h-8 w-auto" src="neat_logo.png" alt="" style={{ display: "block", height: "80px" }} />
                     </Link>

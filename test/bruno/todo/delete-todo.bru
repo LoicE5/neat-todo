@@ -1,0 +1,26 @@
+meta {
+  name: Delete Todo By ID
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/todo/{{todoId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response confirms deletion", function() {
+    expect(res.body).to.have.property("message")
+    expect(res.body.message).to.equal("Todo deleted successfully")
+  })
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Add User to Group by Email
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/group/{{groupId}}/email/{{testEmail}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response has message confirming addition", function() {
+    expect(res.body).to.have.property("message")
+  })
+}

@@ -4,7 +4,6 @@ import { userGetResponse, userGroupGetResponse } from "@/utils/interfaces"
 import storage from "@/utils/storage"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import config from '../../config'
 import Link from "next/link"
 import SkewTitle from "@/components/SkewTitle"
 
@@ -17,12 +16,12 @@ export async function getGroups(user: userGetResponse): Promise<userGroupGetResp
         }
     })
 
-    if (!response.ok)
+    if(!response.ok)
         return alert(`We failed deleting your groups. Response code : ${response.status}. Error message : ${await response.text()}`)
 
     const responsePayload = await response.json()
 
-    if (responsePayload.length <= 0)
+    if(responsePayload.length <= 0)
         return []
 
     return responsePayload
@@ -34,7 +33,7 @@ export default function Groups() {
 
     useEffect(() => {
 
-        if (!storage.jwt.exists()) {
+        if(!storage.jwt.exists()) {
             router.push('/login')
             return
         }

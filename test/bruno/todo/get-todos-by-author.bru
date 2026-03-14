@@ -1,0 +1,32 @@
+meta {
+  name: Get Todos By Author
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/todo/author/{{userId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response is an array", function() {
+    expect(Array.isArray(res.body)).to.equal(true)
+  })
+
+  test("all todos are authored by the current user", function() {
+    const userId = Number(bru.getEnvVar("userId"))
+    res.body.forEach(function(todo) {
+      expect(todo.author_id).to.equal(userId)
+    })
+  })
+}

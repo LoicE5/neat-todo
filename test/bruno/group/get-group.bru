@@ -1,0 +1,30 @@
+meta {
+  name: Get Group By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/group/{{groupId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 200 OK", function() {
+    expect(res.status).to.equal(200)
+  })
+
+  test("response has group data", function() {
+    expect(res.body).to.have.property("id")
+    expect(res.body).to.have.property("name")
+  })
+
+  test("group id matches the requested id", function() {
+    expect(res.body.id).to.equal(Number(bru.getEnvVar("groupId")))
+  })
+}

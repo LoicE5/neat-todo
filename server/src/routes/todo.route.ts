@@ -20,9 +20,9 @@ routerToDo.get('/group/:group_id', getAllTodoOfGroup)
 
 export default routerToDo
 
-async function createATodo(req: Request,res: Response):Promise<void>{
+async function createATodo(req: Request, res: Response): Promise<void> {
     try {
-        const { 
+        const {
             group_id,
             title,
             description,
@@ -32,45 +32,46 @@ async function createATodo(req: Request,res: Response):Promise<void>{
             author_id
         }: todoCreationPayload = req.body
 
-        if (!title || !assignee_id || !author_id)
+        if(!title || !assignee_id || !author_id)
             return failRequest(res, 400, `Required parameters haven't been set`)
 
         const currentUserId = decodeJwtToken(req.headers.authorization, secret).id
 
-        if (currentUserId !== author_id)
+        if(currentUserId !== author_id)
             failRequest(res, 400, `You cannot assign a todo on behalf of others`)
 
-        let createPayload: todoCreationPayload = {
+        const createPayload: todoCreationPayload = {
             title: validator.escape(title),
             assignee_id: Number(assignee_id),
-            author_id : Number(author_id)
+            author_id: Number(author_id)
         }
 
-        if (group_id)
+        if(group_id)
             createPayload.group_id = Number(group_id)
 
-        if (description)
+        if(description)
             createPayload.description = validator.escape(description)
 
-        if (deadline) {
+        if(deadline) {
             if(validator.isDate(deadline as string))
                 createPayload.deadline = new Date(deadline)
             else
                 return failRequest(res, 400, `Your date format is not valid`)
         }
 
-        if (status) {
+        if(status) {
             if(isValidTodoStatus(status))
                 createPayload.status = validator.escape(status)
             else
                 return failRequest(res, 400, `Your todo's status is not valid`)
         }
-    
+
         const newTodo: Model = await Todo.create(createPayload as Optional<any, any>)
         res.status(201).json(newTodo)
-    
-    } catch (error) {
-        failRequest(res,500, `Internal server error`)
+
+    } catch(error: unknown) {
+        console.error(error)
+        failRequest(res, 500, `Internal server error`)
     }
 }
 
@@ -80,23 +81,23 @@ async function getTodoById(req: Request, res: Response): Promise<void> {
 
         const toDo = await Todo.findByPk(id) as any
 
-        if (!toDo) 
+        if(!toDo)
             return failRequest(res, 404, `ToDo not found`)
-        
+
         const currentUserId = decodeJwtToken(req.headers.authorization, secret).id
         const currentUser = await User.findByPk(currentUserId) as any
 
-        if (!await isUserRelatedToTodo(currentUser, toDo, currentUserId))
+        if(!await isUserRelatedToTodo(currentUser, toDo, currentUserId))
             return failRequest(res, 401, `Unauthorized`)
-        
+
         res.json(toDo)
-    } catch (err) {
-        console.error(err)
-        failRequest(res,500,`Internal server error`)
+    } catch(error: unknown) {
+        console.error(error)
+        failRequest(res, 500, `Internal server error`)
     }
 }
 
-async function updateTodoById(req: Request,res: Response):Promise<void> {
+async function updateTodoById(req: Request, res: Response): Promise<void> {
     try {
         const id = Number(req.params.id)
 
@@ -104,12 +105,12 @@ async function updateTodoById(req: Request,res: Response):Promise<void> {
         const currentUser = await User.findByPk(currentUserId) as any
 
         const toBeUpdatedTodo = await Todo.findByPk(id) as any
-        
-        if (!toBeUpdatedTodo)
-            return failRequest(res,404, `Todo not found`)
+
+        if(!toBeUpdatedTodo)
+            return failRequest(res, 404, `Todo not found`)
 
         // A user can't update a todo he's not related to
-        if (!await isUserRelatedToTodo(currentUser, toBeUpdatedTodo, currentUserId))
+        if(!await isUserRelatedToTodo(currentUser, toBeUpdatedTodo, currentUserId))
             return failRequest(res, 401, `Unauthorized`)
 
         const {
@@ -121,98 +122,97 @@ async function updateTodoById(req: Request,res: Response):Promise<void> {
             group_id
         }: todoUpdatePayload = req.body
 
-        let updatePayload: todoUpdatePayload = {}
+        const updatePayload: todoUpdatePayload = {}
 
-        if (title)
+        if(title)
             updatePayload.title = validator.escape(title)
 
-        if (description)
+        if(description)
             updatePayload.description = validator.escape(description)
 
-        if (status) {
+        if(status) {
             if(isValidTodoStatus(status))
                 updatePayload.status = validator.escape(status)
             else
                 return failRequest(res, 400, `Your todo's status is not valid`)
         }
 
-        if (deadline) {
+        if(deadline) {
             if(validator.isDate(deadline as string))
                 updatePayload.deadline = new Date(deadline)
             else
                 return failRequest(res, 400, `Your date format is not valid`)
         }
 
-        if (assignee_id)
+        if(assignee_id)
             updatePayload.assignee_id = Number(assignee_id)
 
-        if (group_id)
+        if(group_id)
             updatePayload.group_id = Number(group_id)
-        else if (group_id === null)
+        else if(group_id === null)
             updatePayload.group_id = null
 
         // If the payload we generate haven't been populated (wrong params, empty body, ...), we fail the req
-        if (isObjectEmpty(updatePayload))
+        if(isObjectEmpty(updatePayload))
             return failRequest(res, 400, `Your request doesn't have the adequate parameters`)
 
         await toBeUpdatedTodo.update(updatePayload)
 
         res.json(toBeUpdatedTodo)
 
-    } catch(err) {
-        if (err.name == 'SequelizeUniqueConstraintError')
+    } catch(error: unknown) {
+        console.error(error)
+        if((error as any).name == 'SequelizeUniqueConstraintError')
             failRequest(res, 409, `You can't assign the todo to this user`)
         else
             failRequest(res, 500, `Internal server error`)
     }
-
-    
 }
 
-async function deleteTodoById(req: Request, res: Response):Promise<void>{
+async function deleteTodoById(req: Request, res: Response): Promise<void> {
     try {
         const id = Number(req.params.id)
         const todo = await Todo.findByPk(id)
 
-        if (!todo) 
-        return failRequest(res, 404, `Todo not found`)
+        if(!todo)
+            return failRequest(res, 404, `Todo not found`)
 
         const currentUserId = decodeJwtToken(req.headers.authorization, secret).id
         const currentUser = await User.findByPk(currentUserId) as any
 
         // A user can't delete a todo he's not related to
-        if (!await isUserRelatedToTodo(currentUser, todo, currentUserId))
+        if(!await isUserRelatedToTodo(currentUser, todo, currentUserId))
             return failRequest(res, 401, `Unauthorized`)
 
         await todo.destroy()
 
         res.json({ message: 'Todo deleted successfully' })
 
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
 }
 
-async function getAllTodoOfAuthor(req: Request, res: Response):Promise<void> {
-    getAllTodoByCriteria(req,res,"author")
+async function getAllTodoOfAuthor(req: Request, res: Response): Promise<void> {
+    getAllTodoByCriteria(req, res, "author")
 }
 
-async function getAllTodoOfAssignee(req: Request, res: Response):Promise<void> {
-    getAllTodoByCriteria(req,res,"assignee")
+async function getAllTodoOfAssignee(req: Request, res: Response): Promise<void> {
+    getAllTodoByCriteria(req, res, "assignee")
 }
 
 async function getAllTodoOfGroup(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.group_id)
 
-    if (!id) 
+    if(!id)
         return failRequest(res, 400, 'Invalid group ID')
 
     const currentUserId = decodeJwtToken(req.headers.authorization, secret).id
     const currentUser = await User.findByPk(currentUserId) as any
 
     // If the user isn't inside the group, he can't access the todos
-    if (!await currentUser.hasGroup(id))
+    if(!await currentUser.hasGroup(id))
         return failRequest(res, 401, 'Unauthorized')
 
     const todos = await Todo.findAll({
@@ -241,16 +241,16 @@ async function getAllTodoOfGroup(req: Request, res: Response): Promise<void> {
 }
 
 // Utility function used for DRY, not an actual endpoint
-async function getAllTodoByCriteria(req: Request, res: Response, criteria:"author"|"assignee"): Promise<void>{
+async function getAllTodoByCriteria(req: Request, res: Response, criteria: "author" | "assignee"): Promise<void> {
     try {
         const userId = Number(req.params.user_id)
 
-        if (!userId) 
+        if(!userId)
             return failRequest(res, 400, 'Invalid ID')
-        
+
         const currentUserId = decodeJwtToken(req.headers.authorization, secret).id
 
-        if (userId !== currentUserId)
+        if(userId !== currentUserId)
             return failRequest(res, 401, `Unauthorized`)
 
         const todos = await Todo.findAll({
@@ -274,7 +274,7 @@ async function getAllTodoByCriteria(req: Request, res: Response, criteria:"autho
         })
 
         res.json(todos)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }

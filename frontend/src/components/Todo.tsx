@@ -2,13 +2,13 @@ import { TodoStatus } from "@/utils/enums"
 import { NextRouter, useRouter } from "next/router"
 
 interface ToDoProps {
-    id: number,
-    deadline: Date | string,
-    status: string,
-    title: string,
-    description: string,
-    author: string,
-    router?: NextRouter,
+    id: number
+    deadline: Date | string
+    status: string
+    title: string
+    description: string
+    author: string
+    router?: NextRouter
 }
 
 export default function Todo({
@@ -21,7 +21,7 @@ export default function Todo({
     router,
 }: ToDoProps) {
     let statusElement = <p>ERROR: No status</p>
-    switch (status) {
+    switch(status) {
         case TodoStatus.NotStarted:
             statusElement = <p className="italic text-white"><span className="inline-block h-5 w-5 rounded-full bg-gray-400 mr-2"></span>Not started</p>
             break
@@ -39,15 +39,15 @@ export default function Todo({
             break
     }
 
-    if (!(deadline instanceof Date))
+    if(!(deadline instanceof Date))
         deadline = new Date(deadline)
 
-    if (!router) router = useRouter()
+    if(!router) router = useRouter()
 
-    let todayDate = new Date()
+    const todayDate = new Date()
     let late = null
 
-    if (deadline < todayDate && status !== TodoStatus.Done)
+    if(deadline < todayDate && status !== TodoStatus.Done)
         late = <p className="mr-2 font-bold text-white">LATE</p>
 
     return (

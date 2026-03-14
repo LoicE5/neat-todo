@@ -4,41 +4,40 @@ import { getGroups } from "@/pages/groups"
 import { NextRouter, useRouter } from "next/router"
 import storage from "@/utils/storage"
 import { userGetResponse, userGroupGetResponse } from "@/utils/interfaces"
-import config from '../../config'
 import { decodeSafeHtmlChars } from "@/utils/functions"
 import SkewTitle from "./SkewTitle"
 
 interface TodoFormProps {
-    todoId?: number,
-    title?: string,
-    description?: string,
-    deadline?: Date | string,
-    groupId?: number,
-    assigneeId?: number,
-    status: TodoStatus,
-    user?: userGetResponse,
-    router?: NextRouter,
+    todoId?: number
+    title?: string
+    description?: string
+    deadline?: Date | string
+    groupId?: number
+    assigneeId?: number
+    status: TodoStatus
+    user?: userGetResponse
+    router?: NextRouter
     context: 'create' | 'edit'
 }
 
 export default function TodoForm({ todoId, title, description, deadline, groupId, assigneeId, status, user, router, context }: TodoFormProps) {
 
-    if (!router)
+    if(!router)
         router = useRouter()
 
-    if (!user)
+    if(!user)
         user = storage.user.load() as userGetResponse
 
-    if (deadline instanceof Date)
-        deadline = deadline.toISOString().split('T')[0]
+    if(deadline instanceof Date)
+        deadline = deadline.toISOString().split('T').at(0)
 
-    if (deadline?.includes('T'))
-        deadline = deadline.split('T')[0]
+    if(deadline?.includes('T'))
+        deadline = deadline.split('T').at(0)
 
     // Hooks
     const [groups, setGroups] = useState([])
     const [groupOptions, setGroupOptions] = useState([])
-    const [selectedGroupId, setselectedGroupId] = useState(groupId || 0)
+    const [selectedGroupId, setSelectedGroupId] = useState(groupId || 0)
 
     const [todoTitle, setTodoTitle] = useState(title || '')
     const [todoDescription, setTodoDescription] = useState(description || '')
@@ -50,14 +49,14 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
     // onMount
     useEffect(() => {
 
-        if (!storage.jwt.exists()) {
+        if(!storage.jwt.exists()) {
             router!.push('/login')
             return
         }
 
         getGroups(user!).then((groups: any) => {
 
-            const groupOptions: any = [
+            const groupOptionElements: any = [
 
                 (<option key={0} value={0}>🏡 Personal ToDo</option>),
 
@@ -67,7 +66,7 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
             ]
 
             setGroups(groups)
-            setGroupOptions(groupOptions)
+            setGroupOptions(groupOptionElements)
         })
     }, [])
 
@@ -78,20 +77,20 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
      * @returns {HTMLOptionElement[]}
      */
     function groupUsersOptionElements(groupId: number): HTMLOptionElement[] | void {
-        if (selectedGroupId <= 0)
+        if(selectedGroupId <= 0)
             return
 
         const foundUsers = groups.find((group: userGroupGetResponse) => group.id === groupId)! as userGroupGetResponse
 
-        if (!foundUsers)
+        if(!foundUsers)
             return
 
         // We sort the users in order to keep the current user first, so that the first option available is always his nickname & email
         return foundUsers.Users
             .sort((a, b): number => {
-                if (a.id === user!.id)
+                if(a.id === user!.id)
                     return -1
-                if (b.id === user!.id)
+                if(b.id === user!.id)
                     return 1
                 return a.id - b.id
             })
@@ -103,7 +102,7 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
     async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault()
 
-        if (!todoTitle)
+        if(!todoTitle)
             return alert(`Please give your todo a title`)
 
         const payload = {
@@ -117,7 +116,7 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
         }
 
         let url = `/api/todo`
-        if (context === 'edit')
+        if(context === 'edit')
             url = url.concat(`/${todoId}`)
 
         const method = context === 'create' ? 'POST' : 'PUT'
@@ -131,10 +130,10 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
             body: JSON.stringify(payload)
         })
 
-        if (!response.ok)
+        if(!response.ok)
             return alert(`We failed creating or editing your ToDo. Response code : ${response.status}. Error message : ${await response.text()}`)
 
-        if (selectedGroupId > 0)
+        if(selectedGroupId > 0)
             router!.push(`/groupDetails?group_id=${selectedGroupId}`)
         else
             router!.push('/workplace')
@@ -189,7 +188,7 @@ export default function TodoForm({ todoId, title, description, deadline, groupId
                         name="groupTD"
                         className="mx-auto w-1/3 bg-gray-400 hover:bg-gray-400 text-black py-2 px-4 rounded mb-4"
                         value={selectedGroupId}
-                        onChange={event => setselectedGroupId(Number(event.target.value))}
+                        onChange={event => setSelectedGroupId(Number(event.target.value))}
                     >
                         {groupOptions}
                     </select>

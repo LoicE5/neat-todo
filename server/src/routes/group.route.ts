@@ -22,31 +22,30 @@ export default routerGroup
 
 async function createGroup(req: Request, res: Response): Promise<void> {
     try {
-        const { name, firstUsersEmails }:groupCreationPayload = req.body
+        const { name, firstUsersEmails }: groupCreationPayload = req.body
 
-        if (!name)
+        if(!name)
             return failRequest(res, 400, `You must provide a name for your group`)
-    
-        let payload:groupCreationPayload = {
+
+        const payload: groupCreationPayload = {
             name: validator.escape(name),
         }
 
         const createdGroup = await Group.create(payload as Optional<any, any>) as any
 
-        if (firstUsersEmails && firstUsersEmails.length > 0) {
+        if(firstUsersEmails && firstUsersEmails.length > 0) {
             const users = await User.findAll({
                 where: {
-                    email: firstUsersEmails.map(email=>validator.escape(email))
+                    email: firstUsersEmails.map(email => validator.escape(email))
                 } as any
             })
 
             await createdGroup.addUsers(users)
         }
-            
 
         res.status(201).json(createdGroup)
 
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
@@ -58,13 +57,13 @@ async function getGroupById(req: Request, res: Response): Promise<void> {
 
         const group = await Group.findByPk(id)
 
-        if (!group)
-            return failRequest(res,404,`Group not found`)
+        if(!group)
+            return failRequest(res, 404, `Group not found`)
 
         res.json(group)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
-        failRequest(res,500,`Internal server error`)
+        failRequest(res, 500, `Internal server error`)
     }
 }
 
@@ -76,24 +75,24 @@ async function renameGroupById(req: Request, res: Response): Promise<void> {
         const currentUser = await User.findByPk(userId) as any
 
         // If the user isn't inside the group, he can't rename it
-        if (!await currentUser.hasGroup(id))
+        if(!await currentUser.hasGroup(id))
             return failRequest(res, 401, 'Unauthorized')
 
         const { name }: groupRenamePayload = req.body
-        
-        if (!name)
+
+        if(!name)
             return failRequest(res, 400, `You must provide a new name for your group`)
-    
-        const updatePayload:groupRenamePayload = {
+
+        const updatePayload: groupRenamePayload = {
             name: validator.escape(name)
         }
-    
+
         const renamedGroup = await Group.update(updatePayload, {
             where: { id }
         })
-    
+
         res.json(renamedGroup)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
@@ -107,18 +106,18 @@ async function deleteGroupById(req: Request, res: Response): Promise<void> {
         const currentUser = await User.findByPk(userId) as any
 
         // If the user isn't inside the group, he can't rename it
-        if (!await currentUser.hasGroup(id))
+        if(!await currentUser.hasGroup(id))
             return failRequest(res, 401, 'Unauthorized')
 
         const group = await Group.findByPk(id)
 
-        if (!group) 
+        if(!group)
             return failRequest(res, 404, `Group not found`)
 
         await group.destroy()
 
         res.json({ message: 'Group deleted successfully' })
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
@@ -132,7 +131,7 @@ async function getUsersOfGroupById(req: Request, res: Response): Promise<void> {
         const currentUser = await User.findByPk(userId) as any
 
         // If the user isn't inside the group, he can't rename it
-        if (!await currentUser.hasGroup(id))
+        if(!await currentUser.hasGroup(id))
             return failRequest(res, 401, 'Unauthorized')
 
         const group = await Group.findByPk(id) as any
@@ -143,7 +142,7 @@ async function getUsersOfGroupById(req: Request, res: Response): Promise<void> {
         })
 
         res.json(usersOfGroup)
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
@@ -154,23 +153,23 @@ async function addUserToGroupById(req: Request, res: Response): Promise<void> {
         const id = Number(req.params.id)
         const userId = Number(req.params.user_id)
 
-        if (!id || !userId)
+        if(!id || !userId)
             return failRequest(res, 400, `You must provide a group id and a user id in the request parameters`)
 
         const group = await Group.findByPk(id) as any
 
-        if (!group)
+        if(!group)
             return failRequest(res, 404, `Group not found`)
 
         const user = await User.findByPk(userId)
 
-        if (!user)
+        if(!user)
             return failRequest(res, 404, `User not found`)
 
         await group.addUser(user)
 
         res.json({ message: `User n°${userId} added to group n°${id}.` })
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
@@ -179,9 +178,9 @@ async function addUserToGroupById(req: Request, res: Response): Promise<void> {
 async function addUserToGroupByEmail(req: Request, res: Response): Promise<void> {
     try {
         const id = Number(req.params.id)
-        const email = validator.escape(req.params.email)
+        const email = validator.escape(req.params.email as string)
 
-        if (!id || !email || !validator.isEmail(email))
+        if(!id || !email || !validator.isEmail(email))
             return failRequest(res, 400, `You must provide a group id and a user email in the request parameters`)
 
         const user = await User.findOne({
@@ -191,47 +190,47 @@ async function addUserToGroupByEmail(req: Request, res: Response): Promise<void>
         }) as any
         const group = await Group.findByPk(id) as any
 
-        if (!group)
+        if(!group)
             return failRequest(res, 404, `Group not found`)
 
-        if (!user)
+        if(!user)
             return failRequest(res, 404, `User not found`)
 
         await group.addUser(user)
 
         res.json({ message: `User n°${user.id} added to group n°${id}.` })
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }
 }
 
-async function removeUserFromGroupById(req: Request, res: Response): Promise<void>  {
+async function removeUserFromGroupById(req: Request, res: Response): Promise<void> {
     try {
         const id = Number(req.params.id)
         const userId = Number(req.params.user_id)
 
-        if (!id || !userId)
+        if(!id || !userId)
             return failRequest(res, 400, `You must provide a group id and a user id in the request parameters`)
 
         const group = await Group.findByPk(id) as any
 
-        if (!group)
+        if(!group)
             return failRequest(res, 404, `Group not found`)
 
         const user = await User.findByPk(userId) as any
 
-        if (!user)
+        if(!user)
             return failRequest(res, 404, `User not found`)
 
         // If the user isn't inside the group, he can't remove someone from it
-        if (!await user.hasGroup(id))
+        if(!await user.hasGroup(id))
             return failRequest(res, 401, "The user provided doesn't belong to the group provided")
 
         await group.removeUser(user)
 
         res.json({ message: `User n°${userId} removed from group n°${id}.` })
-    } catch (error) {
+    } catch(error: unknown) {
         console.error(error)
         failRequest(res, 500, `Internal server error`)
     }

@@ -4,9 +4,8 @@ import storage from "@/utils/storage"
 import { todoGetResponse, userGetResponse } from "@/utils/interfaces"
 import TodoForm from "@/components/TodoForm"
 import { useEffect, useState } from "react"
-import config from '../../config'
 
-export default function createTodo() {
+export default function EditTodo() {
 
     const router = useRouter()
     const user = storage.user.load() as userGetResponse
@@ -15,7 +14,7 @@ export default function createTodo() {
 
     useEffect(() => {
 
-        if (!storage.jwt.exists()) {
+        if(!storage.jwt.exists()) {
             router.push('/login')
             return
         }
@@ -23,13 +22,13 @@ export default function createTodo() {
         const { todo_id } = router.query
         let todoIdInteger = parseInt(todo_id as string)
 
-        if (!todoIdInteger) {
+        if(!todoIdInteger) {
 
             // If we access the page via another way than the Next Router (direct URL access or other), we can check the GET params the old way
             const urlSearchParams = new URLSearchParams(window.location.search)
             const todoIdFromQueryString = urlSearchParams.get('todo_id')
 
-            if (todoIdFromQueryString) {
+            if(todoIdFromQueryString) {
                 todoIdInteger = parseInt(todoIdFromQueryString)
             } else {
                 router.push('/404')
@@ -65,8 +64,8 @@ export default function createTodo() {
             }
         })
 
-        if (!response.ok) {
-            if (response.status === 404)
+        if(!response.ok) {
+            if(response.status === 404)
                 return await router.push(`/404`) as any
             else
                 return alert(`We failed getting the information of the todo. Response code : ${response.status}. Error message : ${await response.text()}`)

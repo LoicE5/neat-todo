@@ -1,7 +1,6 @@
 import { FormEvent, useState, useEffect } from "react"
 import { NextRouter, useRouter } from 'next/router'
 import storage from "@/utils/storage"
-import config from '../../config'
 import { loginResponse } from "@/utils/interfaces"
 import Link from "next/link"
 
@@ -22,8 +21,8 @@ export async function userLogin(email: string, password: string, router: NextRou
     })
 
     // If we can't login the user automatically, we invite him to do so
-    if (!response.ok) {
-        if (router.asPath.includes('login'))
+    if(!response.ok) {
+        if(router.asPath.includes('login'))
             return alert(`Your login have failed. Response code : ${response.status}. Error message : ${await response.text()}`)
         else
             return await router.push('/login') as any
@@ -37,11 +36,11 @@ export async function userLogin(email: string, password: string, router: NextRou
     await router.push('/workplace')
 }
 
-export default function login() {
+export default function Login() {
     const router = useRouter()
 
     useEffect(() => {
-        if (storage.jwt.exists())
+        if(storage.jwt.exists())
             router.push('/workplace')
     }, [])
 
@@ -51,7 +50,7 @@ export default function login() {
     async function handleFormSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault()
 
-        if (!email || !password)
+        if(!email || !password)
             return alert(`Please fill the form as required`)
 
         await userLogin(email, password, router)

@@ -1,0 +1,52 @@
+meta {
+  name: Signup
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/signup
+  body: json
+  auth: none
+}
+
+script:pre-request {
+  const ts = Date.now()
+  bru.setEnvVar("testEmail", `testuser${ts}@example.com`)
+  bru.setEnvVar("testNickname", `testuser${ts}`)
+}
+
+body:json {
+  {
+    "nickname": "{{testNickname}}",
+    "email": "{{testEmail}}",
+    "password": "TestPassword123"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setEnvVar("userId", res.body.id)
+  }
+}
+
+tests {
+  test("status is 201 Created", function() {
+    expect(res.status).to.equal(201)
+  })
+
+  test("response has user data without password", function() {
+    expect(res.body).to.have.property("id")
+    expect(res.body).to.have.property("email")
+    expect(res.body).to.have.property("nickname")
+    expect(res.body).not.to.have.property("password")
+  })
+
+  test("email matches the request", function() {
+    expect(res.body.email).to.equal(bru.getEnvVar("testEmail"))
+  })
+
+  test("nickname matches the request", function() {
+    expect(res.body.nickname).to.equal(bru.getEnvVar("testNickname"))
+  })
+}

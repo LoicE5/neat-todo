@@ -1,0 +1,25 @@
+meta {
+  name: Remove User From Group
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/group/{{groupId}}/{{userId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status is 404 Not Found (group was already deleted)", function() {
+    expect(res.status).to.equal(404)
+  })
+
+  test("response has message", function() {
+    expect(res.body).to.have.property("message")
+  })
+}
