@@ -4,14 +4,17 @@ const isBrowser = typeof window !== 'undefined'
 
 const storage = {
     clear(): void {
-        if(isBrowser) window.sessionStorage.clear()
+        if(!isBrowser) return
+        window.sessionStorage.clear()
     },
     jwt: {
         save(token: string): void {
-            if(isBrowser) window.sessionStorage.setItem(`jwt`, token)
+            if(!isBrowser) return
+            window.sessionStorage.setItem(`jwt`, token)
         },
         load(bearer: boolean = true): string {
-            const token: string = isBrowser ? window.sessionStorage.getItem(`jwt`) || '' : ''
+            if(!isBrowser) return bearer ? 'Bearer ' : ''
+            const token: string = window.sessionStorage.getItem(`jwt`) || ''
             if(bearer)
                 return `Bearer ${token}`
             return token
@@ -26,7 +29,8 @@ const storage = {
     },
     user: {
         save(user: userGetResponse): void {
-            if(isBrowser) sessionStorage.setItem(`user`, JSON.stringify(user))
+            if(!isBrowser) return
+            sessionStorage.setItem(`user`, JSON.stringify(user))
         },
         load(): userGetResponse | object {
             if(!isBrowser) return {}
