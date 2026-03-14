@@ -3,9 +3,12 @@ import User from '../models/user.model'
 import UserGroup from '../models/user_group.model'
 import validator from 'validator'
 import Group from '../models/group.model'
+import Todo from '../models/todo.model'
+import TodoHistory from '../models/todo_history.model'
 import { failRequest, isUserIdFromTokenMatchingRequest, hashPassword, isObjectEmpty } from '../utils/functions'
 import { userUpdatePayload } from '../utils/interfaces'
 import sequelize from '../../db'
+import { Op } from 'sequelize'
 
 const routerUser: Router = express.Router()
 
@@ -133,6 +136,15 @@ async function deleteUserById(req: Request, res: Response): Promise<void> {
 
         if(!user)
             return failRequest(res, 404, `User not found`)
+
+        // Delete todos referencing this user (triggers afterDestroy hook which writes to todo_history_)
+        await Todo.destroy({ where: { [Op.or]: [{ assignee_id: id }, { author_id: id }] } })
+
+        // Nullify todo_history_ references (includes entries just created by the hook above)
+        await TodoHistory.update(
+            { assignee_id: null, author_id: null },
+            { where: { [Op.or]: [{ assignee_id: id }, { author_id: id }] } }
+        )
 
         await user.destroy()
 

@@ -50,12 +50,16 @@ export function isUserIdFromTokenMatchingRequest(authHeader: IncomingHttpHeaders
     if(!authHeader || !authHeader.startsWith('Bearer '))
         return false
 
-    const reqUserId: number = decodeJwtToken(authHeader).id
+    try {
+        const reqUserId: number = decodeJwtToken(authHeader).id
 
-    if(id !== reqUserId)
+        if(id !== reqUserId)
+            return false
+
+        return true
+    } catch {
         return false
-
-    return true
+    }
 }
 
 /**
